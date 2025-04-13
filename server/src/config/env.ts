@@ -12,4 +12,5 @@ export const EnvVariables = {
   MONGO_URI: process.env.MONGO_URI,
   DATABASE_NAME: process.env.DATABASE_NAME || "pdf_store",
   NODE_ENV: process.env.NODE_ENV || "development",
+  FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
 };
