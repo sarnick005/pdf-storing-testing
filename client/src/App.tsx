@@ -1,16 +1,7 @@
 // File: src/App.tsx
 import { useState, useRef } from "react";
 import "./App.css";
-
-interface RegistrationResponse {
-  msg: string;
-  data: {
-    rollNo: number;
-    pdfFile: string;
-    _id: string;
-    __v: number;
-  };
-}
+import { registerPdf, getPdfByRollNo, getPdfUrl } from "./Apis";
 
 function App() {
   const [rollNo, setRollNo] = useState<string>("");
@@ -59,28 +50,10 @@ function App() {
     setSuccess(false);
     setPdfUrl(null);
 
-    const formData = new FormData();
-    formData.append("rollNo", rollNo);
-    formData.append("pdfFile", file);
-
     try {
-      const response = await fetch("http://localhost:8080/api/v1/register", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const result: RegistrationResponse = await response.json();
+      const result = await registerPdf(rollNo, file);
       setSuccess(true);
-
-      const pdfPath = result.data.pdfFile;
-      const pdfFilename = pdfPath.split("\\").pop() || pdfPath.split("/").pop();
-      console.log(pdfFilename);
-
-      setPdfUrl(`http://localhost:8080/files/temp/${pdfFilename}`);
+      setPdfUrl(getPdfUrl(result.data.pdfFile));
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"
@@ -112,34 +85,14 @@ function App() {
     setViewerPdfUrl(null);
 
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/v1/getPdfByRollNo/${searchRollNo}`,
-        {
-          method: "GET",
-        }
-      );
-
-      if (response.status === 404) {
-        setSearchError("No PDF found for this roll number");
-        setSearchLoading(false);
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = await getPdfByRollNo(searchRollNo);
 
       if (!result.data || !result.data.pdfFile) {
         setSearchError("No PDF found for this roll number");
         return;
       }
 
-      const pdfPath = result.data.pdfFile;
-      const pdfFilename = pdfPath.split("\\").pop() || pdfPath.split("/").pop();
-
-      setViewerPdfUrl(`http://localhost:8080/files/temp/${pdfFilename}`);
+      setViewerPdfUrl(getPdfUrl(result.data.pdfFile));
     } catch (err) {
       setSearchError(
         err instanceof Error ? err.message : "An unknown error occurred"
