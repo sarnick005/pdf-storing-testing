@@ -1,5 +1,7 @@
+// Update your router.ts file:
+
 import { Router } from "express";
-import { getPdfFile, registerCandidate } from "./controllers";
+import { getPdfFile, registerCandidate, getPdfByRollNo } from "./controllers";
 import { uploadMulterMiddleware } from "./multerMiddleware";
 
 const router = Router();
@@ -10,6 +12,8 @@ router.post(
   registerCandidate
 );
 
-router.get("/files/:filename", getPdfFile);
+router.get("/getPdfByRollNo/:rollNo", getPdfByRollNo);
+
+router.get("/files/temp/:filename", getPdfFile);
 
 export default router;
